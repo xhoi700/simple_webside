@@ -4,10 +4,11 @@ from os import path
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
+
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'SHDXUEWF'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'  # Example DB
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
     from .views import view
@@ -16,11 +17,14 @@ def create_app():
     app.register_blueprint(view, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    import .models
+    from .models import User, Note
+
+    create_database(app) 
 
     return app
 
 def create_database(app):
-    if not path.exists('website/ + DB_NAME'):
-        db.create_all(app=app)
-        print('Created Database')
+    if not path.exists("website/" + DB_NAME): 
+        with app.app_context(): 
+            db.create_all()
+            print('Created Database')
